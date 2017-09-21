@@ -8,8 +8,8 @@ mkdir -p lambda-package/cv2 lambda-package/dlib build/numpy build/dlib build/pat
 # download and make patchelf - this will let us quickly update dlib.so's LD_LIBRARY path
 (
 cd build/patchelf
-wget https://github.com/NixOS/patchelf/archive/0.9.zip
-unzip 0.9.zip
+wget https://nixos.org/releases/patchelf/patchelf-0.9/patchelf-0.9.tar.bz2 #https://github.com/NixOS/patchelf/archive/0.9.zip
+tar xvfj patchelf-0.9.tar.bz2
 cd patchelf-0.9 && ./configure && make && sudo make install
 )
 
