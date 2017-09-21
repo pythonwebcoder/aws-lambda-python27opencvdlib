@@ -3,7 +3,7 @@
 # Setting up build env
 sudo yum update -y
 sudo yum install -y git cmake gcc-c++ gcc python-devel chrpath
-mkdir -p lambda-package/cv2 build/numpy
+mkdir -p lambda-package/cv2 build/numpy build/dlib
 
 # Build numpy
 pip install --install-option="--prefix=$PWD/build/numpy" numpy
@@ -40,7 +40,22 @@ strip --strip-all lambda-package/cv2/*
 chrpath -r '$ORIGIN' lambda-package/cv2/__init__.so
 touch lambda-package/cv2/__init__.py
 
-# Copy template function and zip package
-cp template.py lambda-package/lambda_function.py
+# build dlib and add an init module file for python
+sudo yum install -y blas-devel boost-devel lapack-devel
+(
+	cd build
+	git clone https://github.com/davisking/dlib.git
+	cd dlib/python_examples/
+	mkdir build && cd build
+	cmake -D USE_SSE4_INSTRUCTIONS:BOOL=ON ../../tools/python
+	cmake --build . --config Release --target install
+)
+cp build/dlib/dlib.so lambda-package/dlib/__init__.so
+cp /usr/lib64/libboost_python-mt.so.1.53.0 lambda-package/dlib/
+touch lambda-package/dlib/__init__.py
+
+
+# Copy function and zip package
+cp lambda_function.py lambda-package/lambda_function.py
 cd lambda-package
 zip -r ../lambda-package.zip *
