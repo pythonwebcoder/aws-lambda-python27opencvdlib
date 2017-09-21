@@ -29,11 +29,16 @@ If you need to **build** additional dependencies, you'll need to update the buil
 The goal here is to use EC2 to create a lambda packge using AWS linux, zip it up, and conveniently put it in S3 for lambda to use.  There is a build.sh that does that for us.
 
 ### Option 1: with an existing EC2 instance
+(this doesn't autoterminate, so you can play around and figure broken build issues)
+
 - Download the repo `wget https://github.com/dudash/aws-lambda-python-opencv/archive/master.zip`
 - Unzip the archive `unzip master.zip`
 - Launch the script `cd aws-lambda-python-opencv-master && ./build.sh`
 
+
 ### Option 2: without an existing EC2 instance
+(this autoterminates and deletes its EBS after it finishes)
+
 In the EC2 console, launch a new instance with:
 - Amazon Linux AMI
 - Role with S3 write permission
