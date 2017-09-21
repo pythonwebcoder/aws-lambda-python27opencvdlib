@@ -50,12 +50,16 @@ sudo yum install -y blas-devel boost-devel lapack-devel
 	cmake -D USE_SSE4_INSTRUCTIONS:BOOL=ON ../../tools/python
 	cmake --build . --config Release --target install
 )
-cp build/dlib/dlib.so lambda-package/dlib/__init__.so
+cp build/dlib/python_examples/dlib.so lambda-package/dlib/__init__.so
 cp /usr/lib64/libboost_python-mt.so.1.53.0 lambda-package/dlib/
 touch lambda-package/dlib/__init__.py
 
+# This shape_predictor for dlib is useful for face recognition
+wget http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
+bzip2 -d shape_predictor_68_face_landmarks.dat.bz2
+mv shape_predictor_68_face_landmarks.dat lambda-package/shape_predictor_68_face_landmarks.dat
 
-# Copy function and zip package
+# Copy python function and zip
 cp lambda_function.py lambda-package/lambda_function.py
 cd lambda-package
 zip -r ../lambda-package.zip *
