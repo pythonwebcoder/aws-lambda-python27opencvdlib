@@ -39,7 +39,8 @@ The goal here is to use EC2 to create a lambda packge using AWS linux, zip it up
 ### Option 2: without an existing EC2 instance
 (this autoterminates and deletes its EBS after it finishes)
 
-<video src=".screenshots/buildwithEC2.mp4" poster=".screenshots/buildwithEC2.jpg" controls preload></video>
+![buildEC2](.screenshots/buildwithEC2.gif)
+
 
 In the EC2 console, launch a new instance with:
 - Amazon Linux AMI
