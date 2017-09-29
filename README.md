@@ -24,6 +24,14 @@ If you need to **build** additional dependencies, you'll need to update the buil
 2) update files `build.sh`
 3) rebuild as described below
 
+You can reuse the basic example python code, keep in mind it assumes you are going to use S3 for moving data in and out of your function.  So in your lambda setup in the AWS console add values for `S3OUTBUCKET` and `S3INBUCKET`.  Like this:
+
+![buildEC2](.screenshots/lambdavars.png)
+
+Again, assuming you are using S3 you'll want to create an appropiate role so that Lambda can access other services in AWS.  In the screenshot below, mine is called `lambda-s3-execution-role`.
+
+![buildEC2](.screenshots/lambdarole.png)
+
 
 ## Building this module
 The goal here is to use EC2 to create a lambda packge using AWS linux, zip it up, and conveniently put it in S3 for lambda to use.  There is a build.sh that does that for us.
