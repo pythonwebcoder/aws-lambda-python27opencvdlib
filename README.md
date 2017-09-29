@@ -61,6 +61,8 @@ In the EC2 console, launch a new instance with:
 yum update -y
 yum install -y git cmake gcc-c++ gcc python-devel chrpath
 
+pip install --upgrade pip
+
 cd /tmp
 wget https://github.com/dudash/aws-lambda-python-opencv/archive/master.zip
 unzip master.zip

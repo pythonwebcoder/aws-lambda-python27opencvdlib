@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Setting up build env
+echo "+++build.sh+++ Setting up build env"
 sudo yum update -y
 sudo yum install -y git cmake gcc-c++ gcc python-devel chrpath
 mkdir -p lambda-package/cv2 lambda-package/dlib build/numpy build/dlib
 
-# download and make patchelf - this will let us quickly update dlib.so's LD_LIBRARY path
+echo "+++build.sh+++ download and make patchelf - this will let us quickly update LD_LIBRARY paths"
 mkdir -p build/patchelf
 (
 cd build/patchelf
@@ -14,7 +14,7 @@ tar xvfj patchelf-0.9.tar.bz2
 cd patchelf-0.9 && ./configure && make && sudo make install
 )
 
-# Build numpy
+echo "+++build.sh+++ Build numpy"
 sudo yum -y install blas
 sudo yum -y install lapack
 sudo yum -y install atlas-sse3-devel
@@ -32,7 +32,7 @@ cp /usr/lib64/libgfortran.so.3 lambda-package/lib/.
 cp /usr/lib64/libquadmath.so.0 lambda-package/lib/.
 #find "lambda-package/numpy/" -name "**.so" | xargs strip
 
-# Build OpenCV 3.2
+echo "+++build.sh+++ Build OpenCV 3.2"
 (
 	NUMPY=$PWD/lambda-package/numpy/core/include
 	cd build
@@ -57,13 +57,14 @@ cp /usr/lib64/libquadmath.so.0 lambda-package/lib/.
 		.
 	make -j`cat /proc/cpuinfo | grep MHz | wc -l`
 )
+echo "+++build.sh+++ done with opencv build, packaging it"
 cp build/opencv/lib/cv2.so lambda-package/cv2/__init__.so
 cp -L build/opencv/lib/*.so.3.2 lambda-package/cv2
 strip --strip-all lambda-package/cv2/*
 chrpath -r '$ORIGIN' lambda-package/cv2/__init__.so
 touch lambda-package/cv2/__init__.py
 
-# build dlib and add an init module file for python
+echo "+++build.sh+++ Build dlib and add an init module file for python"
 sudo yum install -y blas-devel boost-devel lapack-devel
 (
 	cd build
@@ -74,17 +75,21 @@ sudo yum install -y blas-devel boost-devel lapack-devel
 	cmake -D USE_SSE4_INSTRUCTIONS:BOOL=ON ../../tools/python
 	cmake --build . --config Release --target install
 )
+echo "+++build.sh+++ done with dlib build, packaging it"
 cp build/dlib/python_examples/dlib.so lambda-package/dlib/__init__.so
 cp /usr/lib64/libboost_python-mt.so.1.53.0 lambda-package/dlib/
 touch lambda-package/dlib/__init__.py
 patchelf --set-rpath '$ORIGIN' lambda-package/dlib/__init__.so
 
+echo "+++build.sh+++ wgetting shape_predictor data"
 # This shape_predictor for dlib is useful for face recognition
 wget http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
 bzip2 -d shape_predictor_68_face_landmarks.dat.bz2
 mv shape_predictor_68_face_landmarks.dat lambda-package/shape_predictor_68_face_landmarks.dat
 
-# Copy python function and zip
+echo "+++build.sh+++ Copying everything and zipping"
 cp lambda_function.py lambda-package/lambda_function.py
 cd lambda-package
 zip -r ../lambda-package.zip *
+
+echo "+++build.sh+++ DONE"

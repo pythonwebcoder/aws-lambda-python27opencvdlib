@@ -24,6 +24,11 @@ def lambda_handler(event, context):
 	print "OpenCV version=", cv2.__version__
 	print "np version=", np.__version__
 	print "context=", context
+	print "event=", event
+	
+	#image_key = event.Records[0].s3.object.key;
+	#print image_key
+
 	return "yay, it works!"
 
 if __name__ == "__main__":
