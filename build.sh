@@ -6,17 +6,31 @@ sudo yum install -y git cmake gcc-c++ gcc python-devel chrpath
 mkdir -p lambda-package/cv2 lambda-package/dlib build/numpy build/dlib
 
 # download and make patchelf - this will let us quickly update dlib.so's LD_LIBRARY path
-#mkdir -p build/patchelf
-#(
-#cd build/patchelf
-#wget https://nixos.org/releases/patchelf/patchelf-0.9/patchelf-0.9.tar.bz2 #https://github.com/NixOS/patchelf/archive/0.9.zip
-#tar xvfj patchelf-0.9.tar.bz2
-#cd patchelf-0.9 && ./configure && make && sudo make install
-#)
+mkdir -p build/patchelf
+(
+cd build/patchelf
+wget https://nixos.org/releases/patchelf/patchelf-0.9/patchelf-0.9.tar.bz2 #https://github.com/NixOS/patchelf/archive/0.9.zip
+tar xvfj patchelf-0.9.tar.bz2
+cd patchelf-0.9 && ./configure && make && sudo make install
+)
 
 # Build numpy
-pip install --install-option="--prefix=$PWD/build/numpy" numpy
+sudo yum -y install blas
+sudo yum -y install lapack
+sudo yum -y install atlas-sse3-devel
+pip install -U --install-option="--prefix=$PWD/build/numpy" numpy
 cp -rf build/numpy/lib64/python2.7/site-packages/numpy lambda-package
+mkdir lambda-package/lib
+cp /usr/lib64/atlas-sse3/liblapack.so.3 lambda-package/lib/.
+cp /usr/lib64/atlas-sse3/libptf77blas.so.3 lambda-package/lib/.
+cp /usr/lib64/atlas-sse3/libf77blas.so.3 lambda-package/lib/.
+cp /usr/lib64/atlas-sse3/libptcblas.so.3 lambda-package/lib/.
+cp /usr/lib64/atlas-sse3/libcblas.so.3 lambda-package/lib/.
+cp /usr/lib64/atlas-sse3/libatlas.so.3 lambda-package/lib/.
+cp /usr/lib64/atlas-sse3/libptf77blas.so.3 lambda-package/lib/.
+cp /usr/lib64/libgfortran.so.3 lambda-package/lib/.
+cp /usr/lib64/libquadmath.so.0 lambda-package/lib/.
+#find "lambda-package/numpy/" -name "**.so" | xargs strip
 
 # Build OpenCV 3.2
 (
@@ -55,15 +69,15 @@ sudo yum install -y blas-devel boost-devel lapack-devel
 	cd build
 	git clone https://github.com/davisking/dlib.git
 	cd dlib/python_examples/
-	mkdir build && cd build
+	mkdir build
+	cd build
 	cmake -D USE_SSE4_INSTRUCTIONS:BOOL=ON ../../tools/python
 	cmake --build . --config Release --target install
 )
 cp build/dlib/python_examples/dlib.so lambda-package/dlib/__init__.so
 cp /usr/lib64/libboost_python-mt.so.1.53.0 lambda-package/dlib/
-chrpath -r '$ORIGIN' lambda-package/dlib/__init__.so
 touch lambda-package/dlib/__init__.py
-#patchelf --set-rpath '$ORIGIN' lambda-package/dlib/__init__.so
+patchelf --set-rpath '$ORIGIN' lambda-package/dlib/__init__.so
 
 # This shape_predictor for dlib is useful for face recognition
 wget http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
