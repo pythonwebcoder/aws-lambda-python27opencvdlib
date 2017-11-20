@@ -1,7 +1,5 @@
 # Python OpenCV+DLIB module for AWS Lambda
 
-## UPDATES IN PROGRESS - YMMV
-
 ## Description
 This is a simple script that builds a deployment package including OpenCV compatible with the AWS Lambda Python runtime. The dynamic library is compiled with all extended instruction sets supported by Lambda CPU and binaries are stripped to save space. You simply need to follow the instructions below to use.
 
