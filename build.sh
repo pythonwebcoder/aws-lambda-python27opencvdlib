@@ -90,6 +90,8 @@ mv shape_predictor_68_face_landmarks.dat lambda-package/shape_predictor_68_face_
 echo "+++build.sh+++ Copying everything and zipping"
 cp lambda_function.py lambda-package/lambda_function.py
 cd lambda-package
+pip install face_recognition -t .
+pip install pillow -t .
 zip -r ../lambda-package.zip *
 
 echo "+++build.sh+++ DONE"
